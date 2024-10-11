@@ -19,10 +19,6 @@ type StandAloneStorageReader struct {
 	txn *badger.Txn
 }
 
-type StandAloneStorageDBIterator struct {
-	iterator *engine_util.BadgerIterator
-}
-
 func NewStandAloneStorage(conf *config.Config) *StandAloneStorage {
 	dbPath := conf.DBPath
 	kvPath := filepath.Join(dbPath, "kv")
@@ -63,27 +59,7 @@ func (r *StandAloneStorageReader) GetCF(cf string, key []byte) ([]byte, error) {
 }
 
 func (r *StandAloneStorageReader) IterCF(cf string) engine_util.DBIterator {
-	return &StandAloneStorageDBIterator{engine_util.NewCFIterator(cf, r.txn)}
-}
-
-func (i *StandAloneStorageDBIterator) Item() engine_util.DBItem {
-	return i.iterator.Item()
-}
-
-func (i *StandAloneStorageDBIterator) Valid() bool {
-	return i.iterator.Valid()
-}
-
-func (i *StandAloneStorageDBIterator) Next() {
-	i.iterator.Next()
-}
-
-func (i *StandAloneStorageDBIterator) Seek(key []byte) {
-	i.iterator.Seek(key)
-}
-
-func (i *StandAloneStorageDBIterator) Close() {
-	i.iterator.Close()
+	return engine_util.NewCFIterator(cf, r.txn)
 }
 
 func (r *StandAloneStorageReader) Close() {
